@@ -2,22 +2,38 @@ from discord.ext import commands
 import discord
 
 class Game:
-    games = set()
-    def __init__(self, name, min_players=2, allow_mid_joins=False):
+    games = {}
+    def __init__(self, name, min_players=2, allow_mid_joins=False, single_game=True):
         self.name = name
         self.begun = False
         self.player_list = set()
         self.allow_mid_joins = allow_mid_joins
         self.min_players = min_players
-        Game.games.add(self)
+        self.single_game = single_game
+
+        if single_game:
+            Game.games[self.name] = self
+            return
+        
+        if self.name not in Game.games:
+            Game.games[self.name] = [self]
+        else:
+            Game.games[self.name].append(self)
 
     @staticmethod
     def all_games():
-        return [g.name for g in Game.games]
+        return [g.name for g in Game.games.keys()]
+    
+    @staticmethod
+    def existing_games(game_name):
+        return len(Game.games[game_name]) if isinstance(Game.games[game_name], list) else 1
 
     @staticmethod
-    def get_game(name):
-        return [g for g in Game.games if g.name == name][0]
+    def get_game(name, index=0):
+        g = Game.games[name]
+        if isinstance(g, list):
+            g = g[index]
+        return g
 
     def add_player(self, player : discord.Member):
         if self.begun and not self.allow_mid_joins:

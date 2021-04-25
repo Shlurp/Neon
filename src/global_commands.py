@@ -29,7 +29,7 @@ class Global_commands (commands.Cog, name="Global Commands"):
         await ctx.channel.send("Profile picture changed")
     
     @commands.command()
-    async def game_progress(self, ctx, *game_name):
+    async def game_status(self, ctx, *game_name):
         """
         Sends the progress of a specified game
         
@@ -42,9 +42,16 @@ class Global_commands (commands.Cog, name="Global Commands"):
         Sends a list of names of the valid games
         """
 
-        game_name = " ".join(game_name)
         try:
-            game = Game.get_game(game_name)
+            index = int(game_name[-1])
+            li = len(game_name) - 1
+        except ValueError:
+            index = 0
+            li = len(game_name)
+
+        game_name = " ".join(game_name[:li])
+        try:
+            game = Game.get_game(game_name, index)
         except IndexError:
             await ctx.channel.send("Invalid game. Please choose one of the following:\n```{}```".format("\n".join(Game.all_games())))
             return

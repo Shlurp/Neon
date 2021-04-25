@@ -33,10 +33,10 @@ def search(tribute : Tribute):
     if found != 0:
         return None
     
-    weapon = Weapons_Cache.get_random_weapon(HGgame.tribute_map[tribute.y][tribute.x].rarity)
-    if weapon != None:
-        tribute.add_weapon(weapon)
-    return weapon
+    item = Items.get_random_item(HGgame.tribute_map[tribute.y][tribute.x].rarity)
+    if item != None:
+        tribute.add_object(item)
+    return item
 
 def remove_weapon(tribute : Tribute, weapon_name):
     return tribute.remove_weapon(weapon_name)
@@ -64,5 +64,3 @@ def get_danger_map(tx, ty):
         i += 1
 
     return dmap
-
-    

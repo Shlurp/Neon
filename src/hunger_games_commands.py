@@ -155,8 +155,8 @@ class HGgame_Cog (commands.Cog, name="Hunger Games"):
         await ctx.channel.send(tribute, embed=embed)
 
     @commands.command()
-    @commands.check(is_valid_player)
-    async def HGcheck(self, ctx, weapon_name):
+    #@commands.check(is_valid_player)
+    async def HGcheck(self, ctx, *object_name):
         """
         Sends information on an in-game object
 
@@ -165,24 +165,29 @@ class HGgame_Cog (commands.Cog, name="Hunger Games"):
         weapon name - the name of the weapon to check
         """
 
-        tribute = HGgame.tributes[str(ctx.author.id)]
-        weapon_name = weapon_name.lower()
+        object_name = " ".join(object_name).lower()
 
-        for w in Weapons_Cache.weapons:
-            if w.name == weapon_name:
-                weapon = w
+        for i in Items.items:
+            if i.name == object_name:
+                item = i
                 break
         
-        if weapon == None:
-            await ctx.channel.send("{} invalid weapon name")
+        if item == None:
+            await ctx.channel.send("Invalid object name")
             return
 
-        embed = discord.Embed(title=weapon_name.upper(), color=0xff0000)
-        embed.add_field(name="Damage", value=weapon.damage)
-        embed.add_field(name="Exertion", value=weapon.exertion)
-        embed.add_field(name="Rarity", value=weapon.rarity)
+        embed = discord.Embed(title=object_name.capitalize(), color=0xff0000)
+        if isinstance(item, Weapon):
+            embed.add_field(name="Damage", value=item.damage)
+            embed.add_field(name="Exertion", value=item.exertion)
+        else:
+            embed.add_field(name="Effect", value=item.effect.__doc__, inline=False)
+            for key, value in item.data.items():
+                embed.add_field(name=key.capitalize(), value=value)
+        embed.add_field(name="Rarity", value=item.rarity)
 
-        await ctx.channel.send(tribute, embed=embed)
+        await ctx.channel.send(ctx.author.mention, embed=embed)
+        return
 
     @commands.command()
     @commands.check(is_valid_player)
@@ -226,3 +231,47 @@ class HGgame_Cog (commands.Cog, name="Hunger Games"):
         except IndexError:
             await ctx.channel.send("{} Invalid movement".format(ctx.author.mention))
             return
+
+    @commands.command()
+    @commands.check(is_valid_player)
+    async def HGuse(self, ctx, *obj):
+        """
+        Use an in-game object
+
+        Parameters:
+        -----------
+        obj - the name of the object to use
+        """
+
+        tribute = HGgame.tributes[str(ctx.author.id)]
+        obj_name = " ".join(obj)
+        i = 0
+
+        while i < len(tribute.inventory):
+            if tribute.inventory[i].name == obj_name:
+                break
+            i += 1
+
+        if i == len(tribute.inventory):
+            await ctx.channel.send("Invalid object")
+            return
+        
+        item = tribute.inventory[i]
+        item.call(tribute)
+        tribute.inventory.pop(i)
+
+        await ctx.channel.send("{} used their {}".format(tribute, obj_name))
+
+    @commands.command()
+    @commands.check(is_valid_player)
+    async def HGweary(self, ctx):
+        """
+        Wear yourself down (for testing purposes, or if you're a sore loser)
+        """
+        
+        tribute = HGgame.tributes[str(ctx.author.id)]
+
+        tribute.health = tribute.health - 1 if tribute.health > 1 else tribute.health
+        tribute.stamina = tribute.stamina - 1 if tribute.stamina > 1 else tribute.stamina
+
+        await ctx.channel.send("{} got wearier".format(tribute))

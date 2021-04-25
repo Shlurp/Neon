@@ -2,13 +2,72 @@ from random import *
 import math
 from global_objs import *
 
+def increase_stamina(t, stamina=1):
+    """
+    Increases a player's stamina
+    """
+
+    t.stamina += stamina
+    if t.stamina > t.max_stamina:
+        t.stamina = t.max_stamina
+
+def increase_health(t, health=1):
+    """
+    Increases a player's health
+    """
+    
+    t.health += health
+    if t.health > t.max_health:
+        t.health = t.max_health
+
+class Weapon:
+    def __init__(self, name, damage, exertion, rarity=0):
+        self.name = name
+        self.damage = damage
+        self.exertion = exertion
+        self.rarity = rarity
+        
+    def __str__ (self):
+        return self.name
+
+class Usable:
+    def __init__(self, name, effect, rarity=0, **data):
+        self.name = name
+        self.effect = effect
+        self.rarity = rarity
+        self.data = data
+
+    def __str__ (self):
+        return self.name
+    
+    def call (self, *args, **kwargs):
+        self.effect(*args, **kwargs, **self.data)
+
+class Items:
+    fist = Weapon("fist", 1, 0)
+    items = (
+        Weapon("sword", 3, 2, 5),
+        Weapon("rock", 2, 3, 0),
+        Weapon("knife", 2, 1, 3),
+        Weapon("gun", 6, 1, 10),
+
+        Usable("sleeping bag", increase_stamina, 1, stamina=3),
+        Usable("medicine", increase_health, 5, health=3)
+    )
+    
+    @staticmethod
+    def get_random_item(rarity):
+        return choice([o for o in Items.items if o.rarity <= rarity])
+
 class Tribute:
-    def __init__(self, discord_id, x=3, y=3):
+    def __init__(self, discord_id, x=3, y=3, max_health=10, max_stamina=10):
         self.id = discord_id
         self.inventory = []
-        self.weapons = set([Weapons_Cache.fist])
-        self.health = 10
-        self.stamina = 100
+        self.weapons = set([Items.fist])
+        self.max_health = max_health
+        self.health = max_health
+        self.max_stamina = max_stamina
+        self.stamina = max_stamina
         self.x = x
         self.y = y
 
@@ -48,29 +107,13 @@ class Tribute:
 
 
     add_weapon = lambda self, weapon : self.weapons.add(weapon)
+    add_item = lambda self, item : self.inventory.append(item)
 
-class Weapon:
-    def __init__(self, name, damage, exertion, rarity=0):
-        self.name = name
-        self.damage = damage
-        self.exertion = exertion
-        self.rarity = rarity
-        
-    def __str__ (self):
-        return self.name
-
-class Weapons_Cache:
-    fist = Weapon("fist", 1, 0)
-    weapons = (
-        Weapon("sword", 3, 2, 5),
-        Weapon("rock", 2, 3, 0),
-        Weapon("knife", 2, 1, 3),
-        Weapon("gun", 6, 1, 10),
-        )
-    
-    @staticmethod
-    def get_random_weapon(rarity):
-        return choice([weapon for weapon in Weapons_Cache.weapons if weapon.rarity <= rarity])
+    def add_object(self, obj):
+        if isinstance(obj, Weapon):
+            self.add_weapon(obj)
+        else:
+            self.add_item(obj)
 
 class Map_Square():
     def __init__(self, rarity):
@@ -107,6 +150,5 @@ class HungerGames_game (Game):
         t.x += dx
         t.y += dy
         self.tribute_map[t.y][t.x].tributes.append(t.id)
-
 
 HGgame = HungerGames_game()
