@@ -24,7 +24,7 @@ def is_players_turn(p_id):
     try:
         b = get_game(p_id)
         if b != None:
-            return b.players[b.turn] == int(p_id)
+            return b.players[b.turn] == int(p_id) and b.fighting
         else:
             return False
     except KeyError:
@@ -54,8 +54,12 @@ class Battleship_Cog (commands.Cog, name="Battleship Commands"):
         except KeyError:
             last_game = None
 
-        if last_game == None or len(last_game.player_list) >= 2:
-            bsGame = BattleshipGame()
+        if last_game == None or len(last_game.player_list) >= last_game.max_players:
+            try:
+                bsGame = BattleshipGame()
+            except IndexError:
+                await ctx.channel.send("{} too many games at the moment".format(ctx.author.mention))
+                return
             bsGame.add_player(ctx.author)
             await ctx.channel.send("Joined!")
         else:
@@ -123,17 +127,21 @@ class Battleship_Cog (commands.Cog, name="Battleship Commands"):
         board = game.boards[[k for k in game.boards.keys() if int(k) != ctx.author.id][0]]
         
         try:
-            hit, dead = board.fire(x, y)
+            hit, dead, boat_name = board.fire(x, y)
         except ValueError:
             await ctx.channel.send("{} - you already shot there!".format(ctx.author.mention))
             return
         
         if dead:
-            await ctx.channel.send("{} wins!".format(ctx.author.mention))
+            await ctx.channel.send("<@!{}> :vs: <@!{}>\n**{} wins battleship!**".format(game.players[0], game.players[1], ctx.author.mention))
+            game.end()
             return
         
         if hit:
-            await ctx.channel.send("{} - hit!".format(ctx.author.mention))
+            if boat_name != None:
+                await ctx.channel.send("{} - you sunk your opponent's {}".format(ctx.author.mention, boat_name.capitalize()))
+            else:
+                await ctx.channel.send("{} - hit!".format(ctx.author.mention))
         else:            
             await ctx.channel.send("{} - miss...".format(ctx.author.mention))
 

@@ -1,8 +1,7 @@
 from global_objs import *
 
 class Ship:
-    # ships = {"carrier" : 5, "battleship" : 4, "cruiser" : 3, "submarine" : 3, "destroyer" : 2}
-    ships = {"carrier" : 2}
+    ships = {"carrier" : 5, "battleship" : 4, "cruiser" : 3, "submarine" : 3, "destroyer" : 2}
 
     def __init__(self, name, x1, y1, direction):
         self.name = name.lower()
@@ -35,6 +34,8 @@ class Ship:
             raise ValueError
 
         self.targets[index] = True
+
+        return self.is_sunk()
 
     def is_sunk(self):
         return False not in self.targets
@@ -80,17 +81,19 @@ class Board:
     
     def fire(self, x, y):
         boat_i, target_i = self.board[y][x]
+        boat_name = None
         if not isinstance(boat_i, bool) and boat_i != None:    # Boat is located here, not hit
-            self.boats[boat_i].hit(target_i)
+            sunk = self.boats[boat_i].hit(target_i)
             self.board[y][x] = (True, None)
             hit = True
+            boat_name = self.boats[boat_i].name if sunk else None
         elif isinstance(boat_i, bool):                        # Already hit
             raise ValueError
         else:                               # Not hit, no boat
             self.board[y][x] = (False, None)
             hit = False
 
-        return (hit, self.dead())
+        return (hit, self.dead(), boat_name)
 
     def dead(self):
         for boat in self.boats:
@@ -126,3 +129,9 @@ class BattleshipGame(Game):
         
         self.fighting = True
         return True
+
+    def end(self):
+        for i in range(len(Game.games["battleship"])):
+            if Game.games["battleship"][i] == self:
+                Game.games["battleship"].pop(i)
+

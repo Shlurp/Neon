@@ -42,24 +42,23 @@ class Global_commands (commands.Cog, name="Global Commands"):
         Sends a list of names of the valid games
         """
 
+        game_name = " ".join(game_name)
         try:
-            index = int(game_name[-1])
-            li = len(game_name) - 1
-        except ValueError:
-            index = 0
-            li = len(game_name)
-
-        game_name = " ".join(game_name[:li])
-        try:
-            game = Game.get_game(game_name, index)
-        except IndexError:
+            game = Game.get_game(game_name)
+        except KeyError:
             await ctx.channel.send("Invalid game. Please choose one of the following:\n```{}```".format("\n".join(Game.all_games())))
             return
 
         embed = discord.Embed(title=game_name.capitalize(), color=0x0000ff)
         embed.set_thumbnail(url=ctx.guild.icon_url)
-        embed.add_field(name="Has started", value=game.begun, inline=False)
-        embed.add_field(name="Players", value="{}".format(", ".join([f"<@!{i}>" for i in game.player_list]) if len(game.player_list) >= 1 else "🕸️"))
+
+        if isinstance(game, list):
+            for g in game:
+                embed.add_field(name="Has started", value=g.begun)
+                embed.add_field(name="Players", value="{}\n".format(", ".join([f"<@!{i}>" for i in g.player_list]) if len(g.player_list) >= 1 else "🕸️"), inline=False)
+        else:
+            embed.add_field(name="Has started", value=game.begun, inline=False)
+            embed.add_field(name="Players", value="{}".format(", ".join([f"<@!{i}>" for i in game.player_list]) if len(game.player_list) >= 1 else "🕸️"))
 
         await ctx.channel.send(ctx.author.mention, embed=embed)
         

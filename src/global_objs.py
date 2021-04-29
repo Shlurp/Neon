@@ -20,24 +20,21 @@ class Game:
         if self.name not in Game.games:
             Game.games[self.name] = [self]
         else:
-            if len(Game.games[self.name] >= Game.max_num_games):
+            if len(Game.games[self.name]) >= Game.max_num_games:
                 raise IndexError
             Game.games[self.name].append(self)
 
     @staticmethod
     def all_games():
-        return [g.name for g in Game.games.keys()]
+        return [g for g in Game.games.keys()]
     
     @staticmethod
     def existing_games(game_name):
         return len(Game.games[game_name]) if isinstance(Game.games[game_name], list) else 1
 
     @staticmethod
-    def get_game(name, index=0):
-        g = Game.games[name]
-        if isinstance(g, list):
-            g = g[index]
-        return g
+    def get_game(name):
+        return Game.games[name]
 
     def add_player(self, player : discord.Member):
         """
