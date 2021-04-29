@@ -7,7 +7,7 @@ class Game:
     def __init__(self, name, min_players=2, max_players=None, allow_mid_joins=False, single_game=True):
         self.name = name
         self.begun = False
-        self.player_list = set()
+        self.players = set()
         self.allow_mid_joins = allow_mid_joins
         self.min_players = min_players
         self.max_players = max_players
@@ -54,43 +54,43 @@ class Game:
         IndexError - cant add player to list (game has started)
         """
 
-        if (self.max_players != None and len(self.player_list) >= self.max_players) or (self.begun and not self.allow_mid_joins):
+        if (self.max_players != None and len(self.players) >= self.max_players) or (self.begun and not self.allow_mid_joins):
             raise IndexError
-        self.player_list.add(player.id)
+        self.players.add(player.id)
 
-        if len(self.player_list) == self.max_players:
+        if len(self.players) == self.max_players:
             self.begin()
             return True
 
         return False
     
     def remove_player(self, player : discord.Member):
-        self.player_list.remove(player.id)
-        if len(self.player_list) == 1:
-            return list(self.player_list)[0]
-        elif len(self.player_list) < 1:
+        self.players.remove(player.id)
+        if len(self.players) == 1:
+            return list(self.players)[0]
+        elif len(self.players) < 1:
             return None
         return False
 
     def remove_player(self, player_id : int):
-        self.player_list.remove(player_id)
-        if len(self.player_list) == 1:
-            return list(self.player_list)[0]
-        elif len(self.player_list) < 1:
+        self.players.remove(player_id)
+        if len(self.players) == 1:
+            return list(self.players)[0]
+        elif len(self.players) < 1:
             return None
         return False
 
     def begin(self):
-        if len(self.player_list) < self.min_players:
+        if len(self.players) < self.min_players:
             raise ValueError
         self.begun = True
     
     def end(self):
         self.begun = False
-        self.player_list = set()
+        self.players = set()
 
     def get_player_tags(self):
-        return [f"<@!{p_id}>" for p_id in self.player_list]
+        return [f"<@!{p_id}>" for p_id in self.players]
 
 get_user_id = lambda tag: int(tag.replace('<', '').replace('>', '').replace('@', '').replace('!', ''))
 

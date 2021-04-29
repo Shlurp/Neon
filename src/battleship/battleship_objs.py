@@ -49,14 +49,18 @@ class Board:
                                                                                         # Once a boat is set there, (Boat index, Boat spot index)
                                                                                         # Once fired on, if hit: (True, None)
                                                                                         # if miss: (False, None)
-        self.boats = []
+        self.ships = []
         self.ready = False
 
     def add_ship(self, s : Ship):
         if self.ready:
             raise ValueError
-        if s.name in [b.name for b in self.boats]:
-            raise NameError
+            
+        if s.name in [b.name for b in self.ships]:
+            old_s = [ship for ship in self.ships if ship.name == s.name][0]
+            for p in old_s.points:
+                self.board[p[1]][p[0]] = (None, None)
+            self.ships = [ship for ship in self.ships if ship.name != s.name]
 
         e = s.get_extremes()
 
@@ -70,11 +74,11 @@ class Board:
 
         i = 0
         for p in s.points:
-            self.board[p[1]][p[0]] = (len(self.boats), i)       # Boat index, target index
+            self.board[p[1]][p[0]] = (len(self.ships), i)       # Boat index, target index
             i += 1
         
-        self.boats.append(s)
-        if len(self.boats) == len(Ship.ships):
+        self.ships.append(s)
+        if len(self.ships) == len(Ship.ships):
             self.ready = True
             return True
         return False
@@ -83,10 +87,10 @@ class Board:
         boat_i, target_i = self.board[y][x]
         boat_name = None
         if not isinstance(boat_i, bool) and boat_i != None:    # Boat is located here, not hit
-            sunk = self.boats[boat_i].hit(target_i)
+            sunk = self.ships[boat_i].hit(target_i)
             self.board[y][x] = (True, None)
             hit = True
-            boat_name = self.boats[boat_i].name if sunk else None
+            boat_name = self.ships[boat_i].name if sunk else None
         elif isinstance(boat_i, bool):                        # Already hit
             raise ValueError
         else:                               # Not hit, no boat
@@ -96,7 +100,7 @@ class Board:
         return (hit, self.dead(), boat_name)
 
     def dead(self):
-        for boat in self.boats:
+        for boat in self.ships:
             if not boat.is_sunk():
                 return False
 
@@ -106,13 +110,13 @@ class BattleshipGame(Game):
     def __init__(self):
         self.boards = {}
         self.turn = 0
-        self.players = []
+        self.player_list = []
         self.fighting = False
         super().__init__("battleship", single_game=False, max_players=2, min_players=2)
 
     def add_player(self, player):
         self.boards[str(player.id)] = Board()
-        self.players.append(player.id)
+        self.player_list.append(player.id)
 
         return super().add_player(player)
 

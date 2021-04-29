@@ -55,10 +55,10 @@ class Global_commands (commands.Cog, name="Global Commands"):
         if isinstance(game, list):
             for g in game:
                 embed.add_field(name="Has started", value=g.begun)
-                embed.add_field(name="Players", value="{}\n".format(", ".join([f"<@!{i}>" for i in g.player_list]) if len(g.player_list) >= 1 else "🕸️"), inline=False)
+                embed.add_field(name="Players", value="{}\n".format(", ".join([f"<@!{i}>" for i in g.players]) if len(g.players) >= 1 else "🕸️"), inline=False)
         else:
             embed.add_field(name="Has started", value=game.begun, inline=False)
-            embed.add_field(name="Players", value="{}".format(", ".join([f"<@!{i}>" for i in game.player_list]) if len(game.player_list) >= 1 else "🕸️"))
+            embed.add_field(name="Players", value="{}".format(", ".join([f"<@!{i}>" for i in game.players]) if len(game.players) >= 1 else "🕸️"))
 
         await ctx.channel.send(ctx.author.mention, embed=embed)
         

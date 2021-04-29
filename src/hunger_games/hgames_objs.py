@@ -125,12 +125,12 @@ class HungerGames_game (Game):
         super().__init__("hunger games", max_players=24)
 
     def begin (self):
-        if len(self.player_list) < self.min_players:
+        if len(self.players) < self.min_players:
             raise ValueError
 
         self.tributes = {}
         self.tribute_map = [[Map_Square(math.ceil(10 - 10 / (3 * math.sqrt(2)) * math.sqrt((i - 3) ** 2 + (j - 3) ** 2))) for j in range(7)] for i in range(7)]
-        for player_id in self.player_list:
+        for player_id in self.players:
             t = Tribute(player_id)
             self.tributes[str(player_id)] = t
             self.tribute_map[t.y][t.x].tributes.append(t.id)

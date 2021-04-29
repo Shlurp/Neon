@@ -6,7 +6,7 @@ def get_game(p_id) -> BattleshipGame:
     battleships = Game.games["battleship"]
 
     for b in battleships:
-        if int(p_id) in b.player_list:
+        if int(p_id) in b.players:
             return b
 
     return None
@@ -24,7 +24,7 @@ def is_players_turn(p_id):
     try:
         b = get_game(p_id)
         if b != None:
-            return b.players[b.turn] == int(p_id) and b.fighting
+            return b.player_list[b.turn] == int(p_id) and b.fighting
         else:
             return False
     except KeyError:
@@ -43,18 +43,28 @@ def is_fighting(p_id):
 is_valid_and_private = lambda ctx: ctx.channel.type == discord.ChannelType.private and is_valid_player(ctx.author.id)
 
 class Battleship_Cog (commands.Cog, name="Battleship Commands"):
+    """
+    Commands for the battleship game
+    """
+    
     def __init__(self, bot : commands.Bot):
         self.bot = bot
 
     @commands.command()
     @commands.check(lambda ctx: ctx.channel.type != discord.ChannelType.private and not is_valid_player(ctx.author.id))
     async def BSjoin(self, ctx):
+        """
+        Adds you to a battleship game
+
+        If one is available, you will join it, if not, one will be created.
+        """
+
         try:
             last_game = Game.games["battleship"][-1]
         except KeyError:
             last_game = None
 
-        if last_game == None or len(last_game.player_list) >= last_game.max_players:
+        if last_game == None or len(last_game.players) >= last_game.max_players:
             try:
                 bsGame = BattleshipGame()
             except IndexError:
@@ -69,8 +79,21 @@ class Battleship_Cog (commands.Cog, name="Battleship Commands"):
                 await ctx.channel.send("An unexpected situation occurred, please report this.")
     
     @commands.command()
-    @commands.check(lambda ctx: ctx.channel.type == discord.ChannelType.private and not is_fighting(ctx.author.id))
+    @commands.check(lambda ctx: is_valid_and_private(ctx) and not is_fighting(ctx.author.id))
     async def BSset(self, ctx, shipname : str, direction : str, x0 : int, y0 : int):
+        """
+        Place a ship on your board
+
+        This can only be used before the fighting stage of the game begins (when the last ship is placed)
+
+        Parameters:
+        -----------
+        shipname - the name of the ship to place, must be one of the following: carrier, battleship, cruiser, submarine, destroyer
+        direction - orientation of the ship - left, right, down, up
+        x0 - starting x position (0 - left, 9 - right)
+        y0 - starting y position (0 - top, 9 - bottom)
+        """
+
         try:
             ship = Ship(shipname.lower(), x0, y0, direction.lower())
         except KeyError:
@@ -90,13 +113,19 @@ class Battleship_Cog (commands.Cog, name="Battleship Commands"):
             await ctx.channel.send("{} invalid spot".format(ctx.author.mention))
 
         if game.begin_fight():
-            players = [await self.bot.fetch_user(int(i)) for i in game.player_list]
-            for p in players:
+            player_list = [await self.bot.fetch_user(int(i)) for i in game.players]
+            for p in player_list:
                 await p.send("Your Battleship game has begun!")
 
     @commands.command()
     @commands.check(is_valid_and_private)
     async def BSboard(self, ctx):
+        """
+        Sends the current state of your board
+
+        Can only be sent in DMs
+        """
+
         game = get_game(ctx.author.id)
         board_obj = game.boards[str(ctx.author.id)]
         board = board_obj.board
@@ -109,7 +138,7 @@ class Battleship_Cog (commands.Cog, name="Battleship Commands"):
                 if s[0] == None:
                     gboard += ":blue_square:"
                 elif not isinstance(s[0], bool):
-                    ship = board_obj.boats[s[0]]
+                    ship = board_obj.ships[s[0]]
                     gboard += ":ship:"
                 elif s[0] == True:
                     gboard += ":red_circle:"
@@ -123,23 +152,34 @@ class Battleship_Cog (commands.Cog, name="Battleship Commands"):
     @commands.command()
     @commands.check(lambda ctx: ctx.channel.type != discord.ChannelType.private and is_players_turn(ctx.author.id))
     async def BSfire(self, ctx, x : int, y : int):
+        """
+        Fires a shot at the enemy's board.
+
+        Must happen on your turn
+
+        Parameters:
+        -----------
+        x - the x position to shoot (0 - left, 9 - right)
+        y - the y position to shoot (0 - up, 9 - down)
+        """
+
         game = get_game(ctx.author.id)
         board = game.boards[[k for k in game.boards.keys() if int(k) != ctx.author.id][0]]
         
         try:
-            hit, dead, boat_name = board.fire(x, y)
+            hit, dead, ship_name = board.fire(x, y)
         except ValueError:
             await ctx.channel.send("{} - you already shot there!".format(ctx.author.mention))
             return
         
         if dead:
-            await ctx.channel.send("<@!{}> :vs: <@!{}>\n**{} wins battleship!**".format(game.players[0], game.players[1], ctx.author.mention))
+            await ctx.channel.send("<@!{}> :vs: <@!{}>\n**{} wins battleship!**".format(game.player_list[0], game.player_list[1], ctx.author.mention))
             game.end()
             return
         
         if hit:
-            if boat_name != None:
-                await ctx.channel.send("{} - you sunk your opponent's {}".format(ctx.author.mention, boat_name.capitalize()))
+            if ship_name != None:
+                await ctx.channel.send("{} - you sunk your opponent's {}".format(ctx.author.mention, ship_name.capitalize()))
             else:
                 await ctx.channel.send("{} - hit!".format(ctx.author.mention))
         else:            
@@ -150,15 +190,23 @@ class Battleship_Cog (commands.Cog, name="Battleship Commands"):
     @commands.command()
     @commands.check(lambda ctx: is_valid_player(ctx.author.id))
     async def BSturn(self, ctx):
+        """
+        Send whose turn it is
+        """
+
         game = get_game(ctx.author.id)
 
-        await ctx.channel.send("<@!{}> :vs: <@!{}>\n**It is currently <@!{}>'s turn**".format(game.players[0], game.players[1], game.players[game.turn]))
+        await ctx.channel.send("<@!{}> :vs: <@!{}>\n**It is currently <@!{}>'s turn**".format(game.player_list[0], game.player_list[1], game.player_list[game.turn]))
 
     @commands.command()
     @commands.check(lambda ctx: is_fighting(ctx.author.id))
     async def BSshots(self, ctx):
+        """
+        Send a map of the shots you've taken at your enemy
+        """
+
         game = get_game(ctx.author.id)
-        board = board_obj = game.boards[[str(p) for p in game.players if p != ctx.author.id][0]].board
+        board = game.boards[[str(p) for p in game.player_list if p != ctx.author.id][0]].board
 
         gboard = "    ".join(str(i) for i in range(10)) + "\n"
         curr_s = 0
@@ -176,3 +224,20 @@ class Battleship_Cog (commands.Cog, name="Battleship Commands"):
             i += 1
         
         await ctx.channel.send("{}\n{}".format(ctx.author.mention, gboard))
+
+    @commands.command()
+    @commands.check(lambda ctx: is_valid_player(ctx.author.id))
+    async def BSships(self, ctx):
+        """
+        Send a list of the ships you've placed and haven't placed
+        """
+
+        game = get_game(ctx.author.id)
+        board = game.boards[str(ctx.author.id)]
+        ships = [s.name for s in board.ships]
+
+        string = ""
+        for ship in Ship.ships.keys():
+            string += f"**{ship.capitalize()}** - {Ship.ships[ship]} spots {':white_check_mark:' if ship in ships else ':negative_squared_cross_mark:'}\n"
+
+        await ctx.channel.send("{}\n{}".format(ctx.author.mention, string))

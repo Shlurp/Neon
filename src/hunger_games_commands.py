@@ -3,7 +3,7 @@ from global_objs import *
 from discord.ext import commands
 import discord
 
-is_valid_player = lambda ctx: HGgame.begun and ctx.author.id in HGgame.player_list
+is_valid_player = lambda ctx: HGgame.begun and ctx.author.id in HGgame.players
 is_mod = lambda ctx: (isinstance(ctx.author, discord.Member) and (ctx.author.guild_permissions.administrator or discord.utils.get(ctx.author.roles, id=game_lord_role) != None)) or ctx.author.id in game_masters  
 
 class HGgame_Cog (commands.Cog, name="Hunger Games"):
