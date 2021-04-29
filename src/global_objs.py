@@ -3,12 +3,14 @@ import discord
 
 class Game:
     games = {}
-    def __init__(self, name, min_players=2, allow_mid_joins=False, single_game=True):
+    max_num_games = 10      # Maximum number of games per game type
+    def __init__(self, name, min_players=2, max_players=None, allow_mid_joins=False, single_game=True):
         self.name = name
         self.begun = False
         self.player_list = set()
         self.allow_mid_joins = allow_mid_joins
         self.min_players = min_players
+        self.max_players = max_players
         self.single_game = single_game
 
         if single_game:
@@ -18,6 +20,8 @@ class Game:
         if self.name not in Game.games:
             Game.games[self.name] = [self]
         else:
+            if len(Game.games[self.name] >= Game.max_num_games):
+                raise IndexError
             Game.games[self.name].append(self)
 
     @staticmethod
@@ -36,9 +40,32 @@ class Game:
         return g
 
     def add_player(self, player : discord.Member):
-        if self.begun and not self.allow_mid_joins:
+        """
+        Adds a player to the game
+
+        Parameters:
+        -----------
+        player - discord member object to add to player list
+
+        Returns:
+        --------
+        True - maximum player count reached, causes game to start
+        False - maximum player count not reached yet
+
+        Throws:
+        -------
+        IndexError - cant add player to list (game has started)
+        """
+
+        if (self.max_players != None and len(self.player_list) >= self.max_players) or (self.begun and not self.allow_mid_joins):
             raise IndexError
         self.player_list.add(player.id)
+
+        if len(self.player_list) == self.max_players:
+            self.begin()
+            return True
+
+        return False
     
     def remove_player(self, player : discord.Member):
         self.player_list.remove(player.id)
@@ -64,6 +91,9 @@ class Game:
     def end(self):
         self.begun = False
         self.player_list = set()
+
+    def get_player_tags(self):
+        return [f"<@!{p_id}>" for p_id in self.player_list]
 
 get_user_id = lambda tag: int(tag.replace('<', '').replace('>', '').replace('@', '').replace('!', ''))
 

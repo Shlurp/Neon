@@ -58,6 +58,7 @@ class Global_commands (commands.Cog, name="Global Commands"):
 
         embed = discord.Embed(title=game_name.capitalize(), color=0x0000ff)
         embed.set_thumbnail(url=ctx.guild.icon_url)
+        embed.add_field(name="Has started", value=game.begun, inline=False)
         embed.add_field(name="Players", value="{}".format(", ".join([f"<@!{i}>" for i in game.player_list]) if len(game.player_list) >= 1 else "🕸️"))
 
         await ctx.channel.send(ctx.author.mention, embed=embed)

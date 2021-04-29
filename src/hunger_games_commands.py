@@ -4,7 +4,7 @@ from discord.ext import commands
 import discord
 
 is_valid_player = lambda ctx: HGgame.begun and ctx.author.id in HGgame.player_list
-is_mod = lambda ctx: ctx.author.guild_permissions.administrator or discord.utils.get(ctx.author.roles, id=game_lord_role) != None or ctx.author.id in game_masters  
+is_mod = lambda ctx: (isinstance(ctx.author, discord.Member) and (ctx.author.guild_permissions.administrator or discord.utils.get(ctx.author.roles, id=game_lord_role) != None)) or ctx.author.id in game_masters  
 
 class HGgame_Cog (commands.Cog, name="Hunger Games"):
     def __init__(self, bot):
@@ -40,8 +40,10 @@ class HGgame_Cog (commands.Cog, name="Hunger Games"):
         """
 
         try:
-            HGgame.add_player(ctx.author)
+            start = HGgame.add_player(ctx.author)
             await ctx.channel.send("Joined!")
+            if start:
+                await ctx.channel.send("{}\n**Hunger games: Game has started**".format("".join(HGgame.get_player_tags())))
         except IndexError:
             await ctx.channel.send("Game is already in progress")
             return

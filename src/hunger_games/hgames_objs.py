@@ -122,7 +122,7 @@ class Map_Square():
 
 class HungerGames_game (Game):
     def __init__(self):
-        super().__init__("hunger games")
+        super().__init__("hunger games", max_players=24)
 
     def begin (self):
         if len(self.player_list) < self.min_players:
