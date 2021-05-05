@@ -1,0 +1,28 @@
+TITLE : Battleship
+COLOR : #ff0000
+THUMBNAIL : https://games.lol/wp-content/uploads/2019/08/battle-of-warships-naval-blitz-battleship.png
+DESCRIPTION : How to play Battleship
+
+#create
+
+#field{The Rules}
+Opponents place their ships on the board either horizontally or vertically. There are 5 ships:
++ The carrier (5 spaces)
++ The battleship (4 spaces)
++ The cruiser (3 spaces)
++ The submarine (3 spaces)
++ The cruiser (2 spaces)
+
+Opponents then take turns guessing where their opponents ships are and trying to sink them.
+#createfield
+
+#field{Commands}
+These are the commands for the game:
++ BSjoin - Join or create a new battleship game
++ BSset <ship name> <direction> <x> <y> - sets the ship whose name is **ship name** in the direction **direction** (left, right, etc) starting at (x, y) (Must be DM)
++ BSboard - shows your board (must be DM)
++ BSfire <x> <y> - after the fighting part begins, you can guess where your opponent's ships are and try and sink them.
++ BSturn - see whose turn it is
++ BSshots - see the shots you've taken
++ BSships - see a list of ships
+#createfield
