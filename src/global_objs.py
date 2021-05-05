@@ -4,7 +4,7 @@ import discord
 class Game:
     games = {}
     max_num_games = 10      # Maximum number of games per game type
-    def __init__(self, name, min_players=2, max_players=None, allow_mid_joins=False, single_game=True):
+    def __init__(self, name, min_players=2, max_players=None, allow_mid_joins=False, single_game=True, can_remove=True):
         self.name = name
         self.begun = False
         self.players = set()
@@ -12,6 +12,7 @@ class Game:
         self.min_players = min_players
         self.max_players = max_players
         self.single_game = single_game
+        self.can_remove = can_remove
 
         if single_game:
             Game.games[self.name] = self
@@ -97,3 +98,5 @@ get_user_id = lambda tag: int(tag.replace('<', '').replace('>', '').replace('@',
 game_server = 834881633373913158
 game_masters = (830760441209815090, 689148779948933181)
 game_lord_role = 834909450451288064
+
+is_mod = lambda ctx: (isinstance(ctx.author, discord.Member) and (ctx.author.guild_permissions.administrator or discord.utils.get(ctx.author.roles, id=game_lord_role) != None)) or ctx.author.id in game_masters
