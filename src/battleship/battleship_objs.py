@@ -112,7 +112,7 @@ class BattleshipGame(Game):
         self.turn = 0
         self.player_list = []
         self.fighting = False
-        super().__init__("battleship", single_game=False, max_players=2, min_players=2)
+        super().__init__("battleship", single_game=False, max_players=2, min_players=2, can_remove=False)
 
     def add_player(self, player):
         self.boards[str(player.id)] = Board()

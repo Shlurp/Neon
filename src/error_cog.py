@@ -52,7 +52,11 @@ class Error_Cog(commands.Cog):
                         can_do = False
                         break
                 
-                diff = self.get_diff(cmd, c.name) + (1 - can_do) * 2
+                try:
+                    diff = self.get_diff(cmd, c.name) + (1 - can_do) * 2
+                except KeyError:
+                    return
+
                 if len(potentials) < 3:
                     potentials.append((c.name, diff, can_do))
                 else:

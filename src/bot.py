@@ -6,6 +6,7 @@ import battleship_commands
 import global_commands
 import error_cog
 import simon_commands
+import howto
 import discord
 import traceback
 import sys
@@ -17,6 +18,7 @@ game_bot.add_cog(global_commands.Global_commands(game_bot))
 game_bot.add_cog(battleship_commands.Battleship_Cog(game_bot))
 game_bot.add_cog(error_cog.Error_Cog(game_bot))
 game_bot.add_cog(simon_commands.Simon_Cog(game_bot))
+game_bot.add_cog(howto.HowTo_Cog(game_bot))
 
 load_dotenv()
 game_bot.run(os.getenv("TOKEN"))

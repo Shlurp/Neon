@@ -4,7 +4,6 @@ import discord
 import random
 import asyncio
 from enum import Enum
-import emoji
 
 class Arrow (Enum):
     up = "⬆️"
@@ -12,12 +11,13 @@ class Arrow (Enum):
     left = "⬅️"
     right = "➡️"
 
-class Simon_Cog(commands.Cog, name="Simon Commands"):
+class Simon_Cog(commands.Cog, name="Simon"):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command()
-    async def SIstart(self, ctx):
+    @commands.check(lambda ctx: ctx.channel.id == 839539768748408872)
+    async def simon(self, ctx):
         """
         Play Simon
 

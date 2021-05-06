@@ -42,7 +42,7 @@ def is_fighting(p_id):
     
 is_valid_and_private = lambda ctx: ctx.channel.type == discord.ChannelType.private and is_valid_player(ctx.author.id)
 
-class Battleship_Cog (commands.Cog, name="Battleship Commands"):
+class Battleship_Cog (commands.Cog, name="Battleship"):
     """
     Commands for the battleship game
     """
@@ -51,7 +51,7 @@ class Battleship_Cog (commands.Cog, name="Battleship Commands"):
         self.bot = bot
 
     @commands.command()
-    @commands.check(lambda ctx: ctx.channel.type != discord.ChannelType.private and not is_valid_player(ctx.author.id))
+    @commands.check(lambda ctx: ctx.channel.id == 839539754214752287 and not is_valid_player(ctx.author.id))
     async def BSjoin(self, ctx):
         """
         Adds you to a battleship game
@@ -150,7 +150,7 @@ class Battleship_Cog (commands.Cog, name="Battleship Commands"):
         await ctx.channel.send(gboard)
 
     @commands.command()
-    @commands.check(lambda ctx: ctx.channel.type != discord.ChannelType.private and is_players_turn(ctx.author.id))
+    @commands.check(lambda ctx: ctx.channel.id == 839539754214752287 and is_players_turn(ctx.author.id))
     async def BSfire(self, ctx, x : int, y : int):
         """
         Fires a shot at the enemy's board.

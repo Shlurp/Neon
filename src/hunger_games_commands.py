@@ -3,15 +3,14 @@ from global_objs import *
 from discord.ext import commands
 import discord
 
-is_valid_player = lambda ctx: HGgame.begun and ctx.author.id in HGgame.players
-is_mod = lambda ctx: (isinstance(ctx.author, discord.Member) and (ctx.author.guild_permissions.administrator or discord.utils.get(ctx.author.roles, id=game_lord_role) != None)) or ctx.author.id in game_masters  
+is_valid_player = lambda ctx: HGgame.begun and ctx.author.id in HGgame.players and ctx.channel.id == 839539730840551504
 
 class HGgame_Cog (commands.Cog, name="Hunger Games"):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command()
-    @commands.check(is_mod)
+    @commands.check(lambda ctx: is_mod(ctx) and ctx.channel.id == 839539730840551504)
     async def HGstart(self, ctx):
         """
         Starts the Hunger Games game
@@ -32,6 +31,7 @@ class HGgame_Cog (commands.Cog, name="Hunger Games"):
         await ctx.channel.send("Game has begun")
 
     @commands.command()
+    @commands.check(lambda ctx: ctx.channel.id == 839539730840551504)
     async def HGjoin(self, ctx):
         """
         Adds caller to the queue for the hunger games game.
@@ -157,7 +157,7 @@ class HGgame_Cog (commands.Cog, name="Hunger Games"):
         await ctx.channel.send(tribute, embed=embed)
 
     @commands.command()
-    #@commands.check(is_valid_player)
+    @commands.check(lambda ctx: ctx.channel.id == 839539730840551504 or ctx.channel.type == discord.ChannelType.private)
     async def HGcheck(self, ctx, *object_name):
         """
         Sends information on an in-game object
