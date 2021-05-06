@@ -15,6 +15,8 @@ def get_embed(path : str, ctx : commands.Context) -> discord.Embed:
             if curr == "":
                 break
             curr = curr.strip()
+            if curr == "":
+                continue
             
             if embed == None:
                 if curr.startswith("TITLE"):
@@ -28,6 +30,10 @@ def get_embed(path : str, ctx : commands.Context) -> discord.Embed:
                 elif curr.startswith("DESCRIPTION"):                    
                     header["description"] = curr[curr.index(':')+1:].strip()
                     des = True
+
+                elif curr.startswith("FOOTER"):
+                    des = False
+                    header["footer"] = curr[curr.index(':')+1:].strip()
 
                 elif curr.startswith("THUMBNAIL"):
                     des = False
@@ -43,6 +49,8 @@ def get_embed(path : str, ctx : commands.Context) -> discord.Embed:
                     embed = discord.Embed(title=header["title"], description=header["description"], color=header["color"])
                     if "thumbnail" in header:
                         embed.set_thumbnail(url=header["thumbnail"])
+                    if "footer" in header:
+                        embed.set_footer(text=header["footer"])
                 elif des:
                     header["description"] += curr
                 else:

@@ -1,0 +1,16 @@
+TITLE : Simon
+COLOR : #0000ff
+THUMBNAIL : https://img.pngio.com/linkbunch-04o31-http-linkbunch-04o31-simon-says-png-392_400.png
+DESCRIPTION : How to play the Simon minigame
+#create
+
+#field{Playing the game}
+This is a recreation of the classic electronic game.
+Use `!simon` to start a game.
+
+The bot will send a message with a series of arrow emojis (which will show up one after the other with a delay between them).
+After this, you'll have to react to that message with the same series of arrow emojis.
+If you get all of them right, you'll progress to the next level, where the delay between arrows is shorter and the number of arrows is larger.
+Can you complete all of the levels?
+#createfield
+

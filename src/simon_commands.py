@@ -31,14 +31,14 @@ class Simon_Cog(commands.Cog, name="Simon"):
         message = await ctx.send("Get ready!")
         points = 0
         
-        for j in range(10):
+        for j in range(15):
             arrows = [str(random.choice(Arrows).value) for i in range(num_arrows)]
             await asyncio.sleep(2)
             for i in arrows:
                 await message.edit(content=i)
                 await asyncio.sleep(delay)
                 await message.edit(content=":black_large_square:")
-                asyncio.sleep(0.1)
+                await asyncio.sleep(0.1)
             await message.edit(content="Your turn! (Use reactions)")
 
             for i in arrows:
