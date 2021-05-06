@@ -115,4 +115,10 @@ class Global_commands (commands.Cog, name="Global Commands"):
             Game.games[game].players.remove(member.id)
         await ctx.send("Member **{}** removed from game **{}**".format(member.display_name, game.capitalize()))
             
+    @commands.command()
+    @commands.check(is_mod)
+    async def send(self, ctx, channel : discord.TextChannel, *message):
+        message = " ".join(message)
+        await channel.send(message)
+        await ctx.message.delete()
         

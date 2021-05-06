@@ -1,0 +1,56 @@
+TITLE : The Hunger Games
+COLOR : #ff0000
+DESCRIPTION : How to play The Hunger Games game
+THUMBNAIL : http://hungergamescatchinfire.weebly.com/uploads/2/0/2/4/20241701/4962955.png?237
+FOOTER : <params> are mandatory, [params] are optional
+#create
+
+#field{The Rules}
+The Hunger Games is a game where you have to be the last one standing (a battle royale if you will).
+You can move around the map, attack other "tributes" (players), and pick up weapons and materials.
+#createfield
+
+#field{Commands}
+These are the commands for the game:
+#createfield
+
+#field{HGjoin}
+Join the queue for the game. You can't join if the game has started already. The maximum number of players is 24, and the game will automatically start once hitting 24 players, but a mod can start it prematurely.
+#createfield
+
+#field{HGattack}
+Attack a random tribute in your sector (the map is split up into a number of sectors, which you can view using HGmap)
+The tribute has a chance (albeit a smaller one) of winning the fight and wounding you, though.
+#createfield
+
+#field{HGsearch}
+Search for a weapon or object and add it to your inventory/weapons
+#createfield
+
+#field{HGdrop}
+<weapon name>
+Remove the weapon by the name **weapon name** from your weapons inventory.
+#createfield
+
+#field{HGme}
+Get your in-game stats.
+#createfield
+
+#field{HGcheck}
+<object name>...
+Get in-game stats on the object by the name **object name**.
+#createfield
+
+#field{HGmap}
+Sends the in-game map. Squares are color-coded to the number of tributes in them. (Green squares have the fewest, red have the most.) The circle is where you are.
+#createfield
+
+#field{HGmove}
+<direction>
+Moves in the direction **direction** (must be left, right, up, or down).
+#createfield
+
+#field{HGuse}
+<object name>...
+Use the object by the name **obect name**.
+#createfield

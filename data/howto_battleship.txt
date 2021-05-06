@@ -2,6 +2,7 @@ TITLE : Battleship
 COLOR : #ff0000
 THUMBNAIL : https://games.lol/wp-content/uploads/2019/08/battle-of-warships-naval-blitz-battleship.png
 DESCRIPTION : How to play Battleship
+FOOTER : <params> are mandatory, [params] are optional
 
 #create
 
@@ -13,16 +14,43 @@ Opponents place their ships on the board either horizontally or vertically. Ther
 + The submarine (3 spaces)
 + The cruiser (2 spaces)
 
-Opponents then take turns guessing where their opponents ships are and trying to sink them.
+Opponents then take turns guessing where their opponents ships are and trying to sink them. The winner is the person that sinks all of their opponent's ships.
 #createfield
 
 #field{Commands}
-These are the commands for the game:
-+ BSjoin - Join or create a new battleship game
-+ BSset <ship name> <direction> <x> <y> - sets the ship whose name is **ship name** in the direction **direction** (left, right, etc) starting at (x, y) (Must be DM)
-+ BSboard - shows your board (must be DM)
-+ BSfire <x> <y> - after the fighting part begins, you can guess where your opponent's ships are and try and sink them.
-+ BSturn - see whose turn it is
-+ BSshots - see the shots you've taken
-+ BSships - see a list of ships
+These are the commands for the Battleship game:
+#createfield
+
+#field{BSjoin}
+Queue up for a game. If an open game exists, you'll join it and it will start. If one doesn't exist, then a new one will be created for you.
+#createfield
+
+#field{BSset}
+<ship name> <direction> <x> <y>
+Place a ship on your board. This can only be used after the game has started and before the fighting part of the game begins.
+Once both players have placed their ships, the fighting stage begins.
+This command can only be used in a DM.
+#createfield
+
+#field{BSboard}
+Shows your board.
+Thus command can only be used in a DM.
+#createfield
+
+#field{BSfire}
+<x> <y>
+Once the fighting stage begins, you can guess (**on your turn**) where your oponents ships are.
+The x value goes from left to right, and y goes from top to bottom (0 0 is then the top left corner).
+#createfield
+
+#field{BSturn}
+See whose turn it is.
+#createfield
+
+#field{BSshots}
+Send a map of all of the spots you've shot at. White marks places where you missed, and red marks places you hit.
+#createfield
+
+#field{BSships}
+Sends a list of ships, and shows which ones you've placed and which ones you haven't.
 #createfield
